@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -22,6 +23,7 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	// validate against database
 	user, err := app.Models.User.GetByEmail(requestPayload.Email)
 	if err != nil {
+		log.Println(err)
 		_ = app.errorJSON(w, errors.New("invalid credentials"), http.StatusUnauthorized)
 		return
 	}

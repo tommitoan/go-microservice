@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-const wedPort = "80"
+const wedPort = "8088"
 
 type Config struct {
 }
