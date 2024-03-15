@@ -19,7 +19,7 @@ type RequestPayload struct {
 }
 
 type AuthPayload struct {
-	Mail     string `json:"mail"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -73,12 +73,13 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 
 	// make sure we get back the right status code
 	if response.StatusCode == http.StatusUnauthorized {
-		_ = app.errorJSON(w, errors.New("invalid credentials"), http.StatusUnauthorized)
-		return
-	} else if response.StatusCode != http.StatusAccepted {
-		_ = app.errorJSON(w, errors.New("error calling auth service"), http.StatusBadRequest)
+		_ = app.errorJSON(w, errors.New("invalid credentials ???"), http.StatusUnauthorized)
 		return
 	}
+	//else if response.StatusCode != http.StatusAccepted {
+	//	_ = app.errorJSON(w, errors.New("error calling auth service"), http.StatusBadRequest)
+	//	return
+	//}
 
 	// create variable we'll read the response.Body from the authentication-service into
 	var jsonFromService jsonResponse
