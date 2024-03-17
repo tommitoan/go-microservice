@@ -2,12 +2,13 @@ package data
 
 import (
 	"context"
+	"log"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"time"
 )
 
 var client *mongo.Client
@@ -32,25 +33,23 @@ type LogEntry struct {
 	UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
 }
 
-// Insert puts a document in the logs collection.
 func (l *LogEntry) Insert(entry LogEntry) error {
 	collection := client.Database("logs").Collection("logs")
 
 	_, err := collection.InsertOne(context.TODO(), LogEntry{
-		Name:      entry.Name,
-		Data:      entry.Data,
+		Name: entry.Name,
+		Data: entry.Data,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})
 	if err != nil {
-		log.Println("Error inserting log entry:", err)
+		log.Println("Error inserting into logs:", err)
 		return err
 	}
 
 	return nil
 }
 
-// All returns all documents in the logs collection, by descending date/time.
 func (l *LogEntry) All() ([]*LogEntry, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -62,7 +61,7 @@ func (l *LogEntry) All() ([]*LogEntry, error) {
 
 	cursor, err := collection.Find(context.TODO(), bson.D{}, opts)
 	if err != nil {
-		log.Println("Finding all documents ERROR:", err)
+		log.Println("Finding all docs error:", err)
 		return nil, err
 	}
 	defer cursor.Close(ctx)
@@ -71,9 +70,10 @@ func (l *LogEntry) All() ([]*LogEntry, error) {
 
 	for cursor.Next(ctx) {
 		var item LogEntry
+
 		err := cursor.Decode(&item)
 		if err != nil {
-			log.Println("Error scanning log into slice:", err)
+			log.Print("Error decoding log into slice:", err)
 			return nil, err
 		} else {
 			logs = append(logs, &item)
@@ -83,9 +83,6 @@ func (l *LogEntry) All() ([]*LogEntry, error) {
 	return logs, nil
 }
 
-// GetOne returns a single document, by ID. Note that we have to convert the parameter id
-// which this function receives to a mongo.ObjectID, which is what Mongo actually requires in
-// order to call the FindOne() function.
 func (l *LogEntry) GetOne(id string) (*LogEntry, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -98,7 +95,6 @@ func (l *LogEntry) GetOne(id string) (*LogEntry, error) {
 	}
 
 	var entry LogEntry
-
 	err = collection.FindOne(ctx, bson.M{"_id": docID}).Decode(&entry)
 	if err != nil {
 		return nil, err
@@ -107,7 +103,6 @@ func (l *LogEntry) GetOne(id string) (*LogEntry, error) {
 	return &entry, nil
 }
 
-// DropCollection deletes the logs collection and everything in it
 func (l *LogEntry) DropCollection() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -121,18 +116,16 @@ func (l *LogEntry) DropCollection() error {
 	return nil
 }
 
-// Update updates on record, by id
 func (l *LogEntry) Update() (*mongo.UpdateResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
+
+	collection := client.Database("logs").Collection("logs")
 
 	docID, err := primitive.ObjectIDFromHex(l.ID)
 	if err != nil {
 		return nil, err
 	}
-
-	log.Println("Matching", l.ID)
-	collection := client.Database("logs").Collection("logs")
 
 	result, err := collection.UpdateOne(
 		ctx,

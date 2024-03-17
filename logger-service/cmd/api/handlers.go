@@ -1,18 +1,15 @@
 package main
 
 import (
-	"logger-service/data"
+	"log-service/data"
 	"net/http"
 )
 
-// JSONPayload is the type for JSON posted to this API
 type JSONPayload struct {
 	Name string `json:"name"`
 	Data string `json:"data"`
 }
 
-// WriteLog is the handler to accept a post request consisting of json payload,
-// and then write it to Mongo
 func (app *Config) WriteLog(w http.ResponseWriter, r *http.Request) {
 	// read json into var
 	var requestPayload JSONPayload
@@ -31,7 +28,7 @@ func (app *Config) WriteLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := jsonResponse{
-		Error:   false,
+		Error: false,
 		Message: "logged",
 	}
 
