@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log-service/data"
+	"logger-service/data"
 	"net/http"
 )
 
@@ -31,7 +31,7 @@ func (app *Config) WriteLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := jsonResponse{
-		Error: false,
+		Error:   false,
 		Message: "logged",
 	}
 
