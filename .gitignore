@@ -1,1 +1,8 @@
 project/db-data/
+frontApp
+logServiceApp
+mailerServiceApp
+authApp
+brokerApp
+listener
+frontEndLinux

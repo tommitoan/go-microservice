@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+
+  postgres:
+    image: 'postgres:14.2'
+    ports:
+      - "5432:5432"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
+      - ./users.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 10s
+      timeout: 2s
+      retries: 10
